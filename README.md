@@ -45,6 +45,9 @@ This is the primary simple output.
 The self-hosted websites allows the editing of the mask with an iPad (given they are in the same wifi).
 ![Manually "corrected" image](assets/demo_2.png)
 
+Interface on the iPad
+![iPad interface](assets/demo_ipad.png)
+
 The correct mask gets saved again to the host computer.
 ![Corrected mask](demo/toyota_corrected_mask.png)
 

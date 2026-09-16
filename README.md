@@ -37,6 +37,17 @@ width and height. The editor works on a copy no larger than 1600 pixels on its
 longest side, so corrections to a larger source are resized with nearest-neighbor
 sampling.
 
+## Current demo workflow
+
+This is the primary simple output.
+![Initial output](./assets/demo_1.png)
+
+The self-hosted websites allows the editing of the mask with an iPad (given they are in the same wifi).
+![Manually "corrected" image](assets/demo_2.png)
+
+The correct mask gets saved again to the host computer.
+![Corrected mask](demo/toyota_corrected_mask.png)
+
 ## Connect another segmentation project
 
 Replace `segment(image)` in `segmenter.py`. It receives a Pillow RGB image at

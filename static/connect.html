@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Segmentation demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 1.5rem; font: 16px system-ui, sans-serif; color: #20242a; background: #f5f7fa; }
+    h1 { margin: 0 0 1.25rem; }
+    main { display: grid; grid-template-columns: minmax(240px, 300px) minmax(0, 1fr); gap: 1.5rem; max-width: 1400px; }
+    section { background: white; border-radius: .8rem; padding: 1.25rem; box-shadow: 0 2px 12px #0001; }
+    h2 { margin: 0 0 .5rem; font-size: 1.2rem; }
+    #qr { display: block; width: min(100%, 280px); height: auto; image-rendering: pixelated; }
+    #editor-link { overflow-wrap: anywhere; }
+    #preview { display: block; width: 100%; max-height: 75vh; object-fit: contain; background: #e5e7eb; }
+    #preview-status { color: #56606d; }
+    @media (max-width: 700px) { main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <h1>Segmentation demo</h1>
+  <main>
+    <section>
+      <h2>Connect the iPad</h2>
+      <p>Scan this QR code to open the Pencil editor.</p>
+      <img id="qr" src="/qr.png" alt="QR code for the iPad editor">
+      <p><a id="editor-link" href="/edit">Open editor</a></p>
+    </section>
+    <section>
+      <h2>Segmentation preview</h2>
+      <p id="preview-status" role="status">Loading preview…</p>
+      <img id="preview" alt="Current segmentation over the source image">
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const link = document.querySelector("#editor-link");
+    const preview = document.querySelector("#preview");
+    const status = document.querySelector("#preview-status");
+    let shownVersion = -1;
+
+    fetch("/api/session").then(response => response.json()).then(session => {
+      link.href = session.editor_url;
+      link.textContent = session.editor_url;
+    }).catch(() => { link.textContent = "Open editor"; });
+
+    /** Refresh the preview only when a successful save changed the mask. @returns {Promise<void>} */
+    async function refreshPreview() {
+      try {
+        const response = await fetch("/api/version", { cache: "no-store" });
+        if (!response.ok) throw new Error("Preview unavailable");
+        const version = Number(await response.text());
+        if (version !== shownVersion) {
+          preview.src = `/api/preview.png?v=${version}`;
+          status.textContent = version === 0 ? "Initial model output" : "Updated after iPad save";
+          shownVersion = version;
+        }
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    }
+
+    refreshPreview();
+    setInterval(refreshPreview, 1500);
+  </script>
+</body>
+</html>
